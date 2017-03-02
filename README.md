@@ -41,7 +41,7 @@ It works by default on all post featured images leveraging the Wordpress post_th
 * Support added for WooCommerce introduced an array of new image sizes. For the best experience we recommend you regenerate thumbnails (https://en-gb.wordpress.org/plugins/regenerate-thumbnails/)
 
 ###### 0.2.0
-* Fixed an issue with images being inside a link (<a>)
+* Fixed an issue with images being inside a link
 
 ###### 0.2.0
 * Upgrade to add support for image captions
