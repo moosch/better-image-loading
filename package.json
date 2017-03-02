@@ -1,0 +1,22 @@
+{
+  "name": "better-image-loading",
+  "version": "0.3.0",
+  "description": "readme.txt",
+  "author": "Moosch <hello@mooschmedia.com>",
+  "license": "ISC",
+  "dependencies": {
+    "gulp": "^3.9.1",
+    "gulp-clean-css": "^2.0.12",
+    "gulp-concat": "^2.6.0",
+    "gulp-minify": "0.0.14",
+    "gulp-rename": "^1.2.2",
+    "gulp-sass": "^2.3.2",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-uglify": "^1.5.4",
+    "gulp-clean-css": "^2.4.0"
+  },
+  "keywords": [
+    "images",
+    "loading"
+  ]
+}
