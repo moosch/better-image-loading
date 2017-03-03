@@ -9,7 +9,7 @@
  * Plugin Name:       Better Image Loading
  * Plugin URI:        http://wp.mooschmedia.com/plugins/better-image-loading/
  * Description:       Load images better on page paint. No more jank!
- * Version:           0.3.0
+ * Version:           0.3.1
  * Author:            Moosch Media
  * Author URI:        http://wp.mooschmedia.com/
  * License:           GPL-2.0+
@@ -32,7 +32,7 @@
  * to fix it.
  */
 
-define( 'BIL_VERSION', '0.3.0' );
+define( 'BIL_VERSION', '0.3.1' );
 define( 'BIL_URL', plugins_url( '', __FILE__ ) );
 define( 'BIL_LANG', '__moosch__' );
 
@@ -472,11 +472,6 @@ if( !class_exists('BetterImageLoading') )
 		 */
 		function enqueue_bil_scripts()
 		{
-			/* 
-			Uncomment for Testing
-			*/
-			// wp_register_script( 'bil-scripts', BIL_URL.'/assets/dist/js/bil-scripts-debug.js', array( 'jquery' ), '999999999999', true );
-
 			wp_register_script( 'bil-scripts', BIL_URL.'/assets/dist/js/bil-scripts.js', array( 'jquery' ), '', true );
 			wp_enqueue_script( 'bil-scripts' );
 		}
