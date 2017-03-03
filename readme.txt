@@ -4,7 +4,7 @@ Tags: images, loading
 Donate link: http://wp.mooschmedia.com/donate.php
 Requires at least: 4.4.0
 Tested up to: 4.7.2
-Stable tag: 0.3.0
+Stable tag: 0.3.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -31,6 +31,9 @@ None yet!
 5. I recommend you regenerate all thumbnails if your media library is not empty.
 
 == Changelog ==
+
+= 0.3.1 =
+* JavaScript update to fix margins moving things around
 
 = 0.3.0 =
 * Partial rewrite
@@ -75,13 +78,13 @@ This is the first version of the plugin
 
 == Roadmap ==
 
-= 0.3.1 =
+= 0.3.2 =
 1. Ability to turn off better image loading for post/page content
 
-= 0.3.2 =
+= 0.3.3 =
 1. Ability to select if you want a blurred image or a single color image like Google Images
 
-= 0.3.3 =
+= 0.3.4 =
 1. Load larger images only when in view
 
 
