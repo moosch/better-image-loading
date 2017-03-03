@@ -14,6 +14,9 @@ It works by default on all post featured images leveraging the Wordpress post_th
 
 ### Changelog
 
+###### 0.3.1
+* JavaScript update to fix margins moving things around
+
 ###### 0.3.0
 * Partial rewrite
 * Added support for WooCommerce
