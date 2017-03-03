@@ -15,7 +15,17 @@
 	var BetterLoader = (function() {
 
 		return {
-
+			getRelativePosition: function( element ){
+				// Need to account for margins and padding top
+				var theCSSprop = window.getComputedStyle(element, null);
+				var top = element.offsetTop;
+				top -= theCSSprop.marginTop;
+				top -= theCSSprop.paddingTop;
+				return {
+					x: element.offsetLeft,
+					y: top
+				};
+			},
 			startLoad: function( element ){;
 
 				var noscript = element.getElementsByTagName('noscript')[0];
@@ -29,6 +39,9 @@
 
 				// Resize blurred image to match full size height
 				blurred.style.height = scaledHeight + 'px';
+
+				// Get blurred relative position
+				var pos = this.getRelativePosition( blurred );
 
 				// Allowable attributes
 				var atts = [
@@ -60,6 +73,9 @@
 				// Switch out classes for full sized ones
 				imgLarge.classList.remove('bil-init');
 				imgLarge.classList.add('bil-full-size');
+
+				imgLarge.style.top = pos.y + 'px';
+				imgLarge.style.left = pos.x + 'px';
 
 				// Resize
 				// imgLarge.style.width = blurred.clientWidth + 'px';
@@ -96,6 +112,8 @@
 
 				// Remove position absolute
 				els.large.classList.add('bil-in-position');
+
+				els.large.removeAttribute('style');
 
 				// remove blurred image (accessibility?)
 				els.blurred.parentElement.removeChild(els.blurred);
