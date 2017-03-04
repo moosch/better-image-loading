@@ -4,7 +4,7 @@ Tags: images, loading
 Donate link: http://wp.mooschmedia.com/donate.php
 Requires at least: 4.4.0
 Tested up to: 4.7.2
-Stable tag: 0.3.1
+Stable tag: 0.3.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -31,6 +31,9 @@ None yet!
 5. I recommend you regenerate all thumbnails if your media library is not empty.
 
 == Changelog ==
+
+= 0.3.2 =
+* Fixed issue with getting attachment id from url
 
 = 0.3.1 =
 * JavaScript update to fix margins moving things around
