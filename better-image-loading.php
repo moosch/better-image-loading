@@ -9,7 +9,7 @@
  * Plugin Name:       Better Image Loading
  * Plugin URI:        http://wp.mooschmedia.com/plugins/better-image-loading/
  * Description:       Load images better on page paint. No more jank!
- * Version:           0.3.1
+ * Version:           0.3.2
  * Author:            Moosch Media
  * Author URI:        http://wp.mooschmedia.com/
  * License:           GPL-2.0+
@@ -22,6 +22,9 @@
  * Thanks to Jake Archibald (@jaffathecake) for his excellent article on responsive 
  * images (https://jakearchibald.com/2015/anatomy-of-responsive-images/)
  *
+ * Thanks to Micah Wood (https://wpscholar.com/blog/get-attachment-id-from-wp-image-url/) 
+ * for the solution of getting an attachment_id from an image url
+ *
  */
 
 /**
@@ -32,7 +35,7 @@
  * to fix it.
  */
 
-define( 'BIL_VERSION', '0.3.1' );
+define( 'BIL_VERSION', '0.3.2' );
 define( 'BIL_URL', plugins_url( '', __FILE__ ) );
 define( 'BIL_LANG', '__moosch__' );
 
@@ -337,12 +340,18 @@ if( !class_exists('BetterImageLoading') )
 				if( strpos($class, 'size-') !== false )
 					$size = str_replace('size-', '', $class);
 
-			if ( !preg_match( '/wp-image-([0-9]+)/i', $html, $class_id ) || !( $attachment_id = absint( $class_id[1] ) ) )
-				return '';
-
-			$attachment_id = ( $attachment_id ? $attachment_id : absint( $class_id[1] ) );
-
+			// Get the image source
 			$src = $this->extract_attribute( $html, 'src' );
+
+			// Attempt to get the image attachment_id
+			// if ( !preg_match( '/wp-image-([0-9]+)/i', $html, $class_id ) || !( $attachment_id = absint( $class_id[1] ) ) )
+			// 	return '';
+			if( !$attachment_id )
+				$attachment_id = $this->get_attachment_id( $src );
+			
+			// If no attachment ID can be found, we assume there are no cropped sizes so bail
+			if( !$attachment_id )
+				return '';
 			
 			// If image src is not local return the markup
 			if( strpos($src, get_site_url()) === false )
@@ -434,6 +443,19 @@ if( !class_exists('BetterImageLoading') )
 		 */
 		function content_filter( $content )
 		{
+			$img = '<img 
+class="test item" srcset="http://localhost:8888/Plugins/BetterImageLoading/wp-content/uploads/2017/02/DSCF2126-1024x768.jpg 1024w, http://localhost:8888/Plugins/BetterImageLoading/wp-content/uploads/2017/02/DSCF2126-300x225.jpg 300w, http://localhost:8888/Plugins/BetterImageLoading/wp-content/uploads/2017/02/DSCF2126-768x576.jpg 768w" 
+sizez="(max-width: 660px) 100vw, 660p, 100vw" 
+src="http://localhost:8888/Plugins/BetterImageLoading/wp-content/uploads/2017/02/DSCF2126-1024x768.jpg" 
+height="495" 
+width="660">';
+			$content = $img.'<br/><br/>'.$content;
+			/*
+			Edge case
+			Remove line breaks in content
+			*/
+			// (?<=is \()(.*?)(?=\s*\))
+			// This is(?s)(.*)sentence
 			// Get all images within markup ( <img...> )
 			preg_match_all('/(<img[^>]*src=".*?"[^>]*>)/i', $content, $matches);
 
@@ -451,6 +473,50 @@ if( !class_exists('BetterImageLoading') )
 
 			}
 			return $content;
+		}
+
+		/**
+		 * Get an attachment ID from URL
+		 *
+		 * Credit to Micah Wood (https://wpscholar.com/blog/get-attachment-id-from-wp-image-url/) for the solution
+		 * 
+		 * @since 0.3.2
+		 * @param string $url 	- the image url
+		 * @return int 			- Attachment ID on success, 0 on failure
+		 * @access private
+		 */
+		function get_attachment_id( $url )
+		{
+			$attachment_id = 0;
+			$dir = wp_upload_dir();
+			if ( false !== strpos( $url, $dir['baseurl'] . '/' ) ) { // Is URL in uploads directory?
+				$file = basename( $url );
+				$query_args = array(
+					'post_type'   => 'attachment',
+					'post_status' => 'inherit',
+					'fields'      => 'ids',
+					'meta_query'  => array(
+						array(
+							'value'   => $file,
+							'compare' => 'LIKE',
+							'key'     => '_wp_attachment_metadata',
+						),
+					)
+				);
+				$query = new WP_Query( $query_args );
+				if ( $query->have_posts() ) {
+					foreach ( $query->posts as $post_id ) {
+						$meta = wp_get_attachment_metadata( $post_id );
+						$original_file       = basename( $meta['file'] );
+						$cropped_image_files = wp_list_pluck( $meta['sizes'], 'file' );
+						if ( $original_file === $file || in_array( $file, $cropped_image_files ) ) {
+							$attachment_id = $post_id;
+							break;
+						}
+					}
+				}
+			}
+			return $attachment_id;
 		}
 
 		/**
