@@ -14,6 +14,9 @@ It works by default on all post featured images leveraging the Wordpress post_th
 
 ### Changelog
 
+###### 0.3.3
+* Removed neglected code
+
 ###### 0.3.2
 * Fixed issue with getting attachment id from url
 
