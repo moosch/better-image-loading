@@ -9,7 +9,7 @@
  * Plugin Name:       Better Image Loading
  * Plugin URI:        http://wp.mooschmedia.com/plugins/better-image-loading/
  * Description:       Load images better on page paint. No more jank!
- * Version:           0.3.2
+ * Version:           0.3.3
  * Author:            Moosch Media
  * Author URI:        http://wp.mooschmedia.com/
  * License:           GPL-2.0+
@@ -35,7 +35,7 @@
  * to fix it.
  */
 
-define( 'BIL_VERSION', '0.3.2' );
+define( 'BIL_VERSION', '0.3.3' );
 define( 'BIL_URL', plugins_url( '', __FILE__ ) );
 define( 'BIL_LANG', '__moosch__' );
 
@@ -443,19 +443,6 @@ if( !class_exists('BetterImageLoading') )
 		 */
 		function content_filter( $content )
 		{
-			$img = '<img 
-class="test item" srcset="http://localhost:8888/Plugins/BetterImageLoading/wp-content/uploads/2017/02/DSCF2126-1024x768.jpg 1024w, http://localhost:8888/Plugins/BetterImageLoading/wp-content/uploads/2017/02/DSCF2126-300x225.jpg 300w, http://localhost:8888/Plugins/BetterImageLoading/wp-content/uploads/2017/02/DSCF2126-768x576.jpg 768w" 
-sizez="(max-width: 660px) 100vw, 660p, 100vw" 
-src="http://localhost:8888/Plugins/BetterImageLoading/wp-content/uploads/2017/02/DSCF2126-1024x768.jpg" 
-height="495" 
-width="660">';
-			$content = $img.'<br/><br/>'.$content;
-			/*
-			Edge case
-			Remove line breaks in content
-			*/
-			// (?<=is \()(.*?)(?=\s*\))
-			// This is(?s)(.*)sentence
 			// Get all images within markup ( <img...> )
 			preg_match_all('/(<img[^>]*src=".*?"[^>]*>)/i', $content, $matches);
 
