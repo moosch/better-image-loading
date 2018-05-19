@@ -17,6 +17,7 @@ For inline images the plugin searches through your post content and refactors th
 
 NOTE:
 You may need to regenerate thumbnails to create the blurred image for each attachment image. We recommend using the [Regenerate Thumbnails](https://en-gb.wordpress.org/plugins/regenerate-thumbnails/) plugin.
+This plugin is designed to accommodate the image dimension ratio of the full size version. If you are using cropped images you may experience resizing issues.
 
 == Frequently Asked Questions ==
 
@@ -31,6 +32,9 @@ None yet!
 5. I recommend you regenerate all thumbnails if your media library is not empty.
 
 == Changelog ==
+
+= 0.3.4 =
+* Performance improvements
 
 = 0.3.3 =
 * Removed neglected code

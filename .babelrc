@@ -1,0 +1,4 @@
+{
+  "presets": ["env"],
+  "plugins": ["transform-regenerator", "transform-async-to-generator"]
+}

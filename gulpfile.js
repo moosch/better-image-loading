@@ -1,10 +1,11 @@
 var gulp = require('gulp');
+var babel = require('gulp-babel');
+var cleanCSS = require('gulp-clean-css');
+var concat = require('gulp-concat');
+var minify = require('gulp-minify');
+var rename = require('gulp-rename');
 var sass = require('gulp-sass');
 var sourcemaps = require('gulp-sourcemaps');
-var concat = require('gulp-concat');
-var rename = require('gulp-rename');
-var minify = require('gulp-minify');
-var cleanCSS = require('gulp-clean-css');
 
 gulp.task('sass', function () {
 	gulp.src( 'assets/scss/bil-styles.scss' )
@@ -23,11 +24,14 @@ gulp.task('js', function(){
 			'assets/js/bil-scripts.js'
 		])
 		.pipe(concat('bil-scripts.js'))
+		.pipe(babel({
+			presets: ['env'],
+		}))
 		.pipe(gulp.dest('./assets/dist/js/'))
 		.pipe(minify({
 			ext:{
 				src:'-debug.js',
-				min:'.js'
+				min:'.js',
 			}
 		}))
 		.pipe(gulp.dest('./assets/dist/js/'));

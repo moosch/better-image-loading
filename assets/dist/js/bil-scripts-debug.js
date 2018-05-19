@@ -1,3 +1,7 @@
+'use strict';
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 /*
  * BetterImageLoading v0.3
  *
@@ -8,158 +12,182 @@
  * http://wp.mooschmedia.com
  * Copyright 2017 BetterImageLoading
  */
-+(function( win, doc ){
++function (win, doc) {
+	/**
+  * Provides requestAnimationFrame in a cross browser way.
+  * @author paulirish / http://paulirish.com/
+  */
 
-	"use strict";
+	if (!win.requestAnimationFrame) {
 
-	var BetterLoader = (function() {
+		win.requestAnimationFrame = function () {
+
+			return win.webkitRequestAnimationFrame || win.mozRequestAnimationFrame || win.oRequestAnimationFrame || win.msRequestAnimationFrame || function ( /* function FrameRequestCallback */callback, /* DOMElement Element */element) {
+
+				win.setTimeout(callback, 1000 / 60);
+			};
+		}();
+	}
+
+	var images = [];
+	var ramChecker = void 0;
+
+	var BetterLoader = function () {
 
 		return {
-			getRelativePosition: function( element ){
-				// Need to account for margins and padding top
-				var theCSSprop = window.getComputedStyle(element, null);
-				var top = element.offsetTop;
-				top -= theCSSprop.marginTop;
-				top -= theCSSprop.paddingTop;
-				return {
-					x: element.offsetLeft,
-					y: top
-				};
-			},
-			startLoad: function( element ){;
+			startLoad: function startLoad(element) {
+				;
 
 				var noscript = element.getElementsByTagName('noscript')[0];
 				var blurred = element.getElementsByTagName('img')[0];
 
 				// Get the ratio for image set sizes
 				var attWidth = blurred.getAttribute('width'),
-					attHeight = blurred.getAttribute('height');
+				    attHeight = blurred.getAttribute('height');
 				var ratio = attWidth / attHeight;
-				var scaledHeight = blurred.clientWidth/ratio;
+				var scaledHeight = blurred.clientWidth / ratio;
 
 				// Resize blurred image to match full size height
 				blurred.style.height = scaledHeight + 'px';
 
-				// Get blurred relative position
-				var pos = this.getRelativePosition( blurred );
-
 				// Allowable attributes
-				var atts = [
-					{key:'alt', value:'alt'},
-					{key:'title', value:'title'},
-					{key:'data-srcset', value:'srcset'},
-					{key:'data-sizes', value:'sizes'},
-					{key:'data-full', value:'full'},
-					{key:'width', value:'width'},
-					// {key:'data-width', value:'width'},
-					{key:'height', value:'height'},
-					// {key:'data-height', value:'height'},
-				];
+				var atts = [{ key: 'alt', value: 'alt' }, { key: 'title', value: 'title' }, { key: 'data-srcset', value: 'srcset' }, { key: 'data-sizes', value: 'sizes' }, { key: 'data-full', value: 'full' }, { key: 'width', value: 'width' },
+				// {key:'data-width', value:'width'},
+				{ key: 'height', value: 'height' }];
 
-				var imgLarge = new Image();
+				var largeImage = doc.createElement('img');
 
-				for( var i = 0; i < atts.length; i++ ){
+				largeImage.className = blurred.className + ' bil-full-size';
+
+				for (var i = 0; i < atts.length; i++) {
 					var att = blurred.getAttribute(atts[i].key);
-					if( att !== null )
-						imgLarge.setAttribute(atts[i].value, att);
+					if (att !== null) largeImage.setAttribute(atts[i].value, att);
 				}
 
-				// Add full sized image source
-				imgLarge.src = blurred.dataset.full;
-
-				// Set all blurred classes
-				imgLarge.className = blurred.className;
-
-				// Switch out classes for full sized ones
-				imgLarge.classList.remove('bil-init');
-				imgLarge.classList.add('bil-full-size');
-
-				imgLarge.style.top = pos.y + 'px';
-				imgLarge.style.left = pos.x + 'px';
-
-				// Resize
-				// imgLarge.style.width = blurred.clientWidth + 'px';
-				// imgLarge.style.height = scaledHeight + 'px';
-
-				// Set parent of blurred image in which to insert new image
 				var par = blurred.parentNode;
+				par.insertBefore(largeImage, par.childNodes[0]);
 
-				imgLarge.onload = function(){
+				var downloadingImage = new Image();
 
-					par.insertBefore(imgLarge, par.childNodes[0]);
+				downloadingImage.onload = function () {
+					largeImage.src = this.src;
 
-					// Remove small after delay to prevent 'blink'
-					setTimeout(function(){
-						BetterLoader.switchToLarge( {blurred: blurred, large: imgLarge} );
-					},500);
+					BetterLoader.switchToLarge({ blurred: blurred, large: largeImage });
 
-					// Finish up by removing blurred and repositioning the large image (delay to allow for css animation)
-					setTimeout(function(){
-						BetterLoader.finishUp( {blurred: blurred, large: imgLarge} );
-					},1000);
+					var timer = void 0;
+					timer = setTimeout(function () {
+						BetterLoader.finishUp({
+							blurred: blurred,
+							large: largeImage,
+							noscript: noscript
+						});
+						clearTimeout(timer);
+						// Remove image
+						downloadingImage.remove();
+					}, 1000);
 				};
 
-			},
-			switchToLarge: function( els ){
+				downloadingImage.src = blurred.dataset.full;
 
+				return;
+			},
+			switchToLarge: function switchToLarge(els) {
 				// Fade in large image
 				els.large.classList.add('bil-loaded');
 				// Fade blurred out
 				els.blurred.classList.add('bil-fadeout');
 
+				return;
 			},
-			finishUp: function( els ){
-
-				// Remove position absolute
-				els.large.classList.add('bil-in-position');
-
-				els.large.removeAttribute('style');
-
-				// remove blurred image (accessibility?)
+			finishUp: function finishUp(els) {
+				// Remove noscript
+				els.blurred.parentElement.removeChild(els.noscript);
+				// Remove blurred
 				els.blurred.parentElement.removeChild(els.blurred);
+				// Remove image class
+				els.large.classList.remove('bil-init');
+				els.large.classList.remove('bil-full-size');
+				els.large.classList.remove('bil-loaded');
+				// Remove parent class
+				els.large.parentElement.classList.remove('bil-container');
 
+				return;
 			},
-			init: function( elements ){
+			initLoading: function initLoading(image) {
+				// Create the wrapper
+				var wrapper = doc.createElement("div");
+				wrapper.className = 'bil-container';
 
-				if( typeof elements !== 'object' || elements.length === 0 )
-					return false;
+				// Add the image to the wrapper
+				var node = image.outerHTML;
 
-				for( var index = 0; index < elements.length; index++ ){
-					// Create the wrapper
-					var wrapper = document.createElement("div");
-					wrapper.className = 'bil-container';
+				// Add noscript
+				node = node + '<noscript>' + node + '</noscript>';
+				wrapper.innerHTML = node;
 
-					// Add the image to the wrapper
-					var node = elements[index].outerHTML;
+				// Insert the wrapper at the image porisiont
+				image.parentNode.insertBefore(wrapper, image);
 
-					// Add noscript
-					node = node + '<noscript>'+node+'</noscript>';
-					wrapper.innerHTML = node;
+				// Remove the original image
+				image.parentNode.removeChild(image);
 
-					// Insert the wrapper at the image porisiont
-					elements[index].parentNode.insertBefore(wrapper, elements[index]);
+				// Initialise the image
+				BetterLoader.startLoad(wrapper);
 
-					// Remove the original image
-					elements[index].parentNode.removeChild(elements[index]);
+				return;
+			},
+			checkInView: function checkInView(el) {
+				var top = el.offsetTop;
+				var left = el.offsetLeft;
+				var width = el.offsetWidth;
+				var height = el.offsetHeight;
 
-					// Initialise the image
-					BetterLoader.startLoad( wrapper );
+				while (el.offsetParent) {
+					el = el.offsetParent;
+					top += el.offsetTop;
+					left += el.offsetLeft;
 				}
 
+				return top < win.pageYOffset + win.innerHeight && left < win.pageXOffset + win.innerWidth && top + height > win.pageYOffset && left + width > win.pageXOffset;
+			},
+			checkImages: function checkImages() {
+				if (images.length == 0) {
+					win.cancelAnimationFrame(ramChecker);
+					return false;
+				}
+				images = images.filter(function (image) {
+					var inView = BetterLoader.checkInView(image);
+					if (inView) {
+						BetterLoader.initLoading(image);
+					}
+					return !inView;
+				});
+				ramChecker = win.requestAnimationFrame(BetterLoader.checkImages);
+
+				return;
+			},
+			init: function init(elements) {
+				if ((typeof elements === 'undefined' ? 'undefined' : _typeof(elements)) !== 'object' || elements.length === 0) {
+					return false;
+				}
+				// Convert nodeList (elements) to array
+				images = [].slice.call(elements);
+				// checkImages
+				ramChecker = win.requestAnimationFrame(BetterLoader.checkImages);
+
+				return;
 			}
 
 		};
-
-	}());
+	}();
 
 	// win.onload = function() {
 	// 	BetterLoader.init( doc.querySelectorAll('.bil-init') );
 	// }
 	/*
-	NOTE: Minor glitch is if the image width is considerably more than available space.
-	The height of the blurred image needs to be scaled to the width/height ratio and this may produce a little 'jank' :( 
-	So to minimise this I removed win.onload wrapper function. JS is loaded in footer so will still find tha elements
-	*/
-	BetterLoader.init( doc.querySelectorAll('.bil-init') );
-
-})( window, document );
+ NOTE: Minor glitch is if the image width is considerably more than available space.
+ The height of the blurred image needs to be scaled to the width/height ratio and this may produce a little 'jank' :(
+ So to minimise this I removed win.onload wrapper function. JS is loaded in footer so will still find tha elements
+ */
+	BetterLoader.init(doc.querySelectorAll('.bil-init'));
+}(window, document);

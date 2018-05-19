@@ -2,14 +2,14 @@
 /**
  * BetterImageLoading plugin file
  * @link              http://wp.mooschmedia.com/plugins/better-image-loading/
- * @since             0.1.2
+ * @since             0.0.1
  * @package           BetterImageLoading
- * 
+ *
  * @wordpress-plugin
  * Plugin Name:       Better Image Loading
  * Plugin URI:        http://wp.mooschmedia.com/plugins/better-image-loading/
  * Description:       Load images better on page paint. No more jank!
- * Version:           0.3.3
+ * Version:           0.3.4
  * Author:            Moosch Media
  * Author URI:        http://wp.mooschmedia.com/
  * License:           GPL-2.0+
@@ -19,10 +19,10 @@
 /**
  * Acknowledgements:
  *
- * Thanks to Jake Archibald (@jaffathecake) for his excellent article on responsive 
+ * Thanks to Jake Archibald (@jaffathecake) for his excellent article on responsive
  * images (https://jakearchibald.com/2015/anatomy-of-responsive-images/)
  *
- * Thanks to Micah Wood (https://wpscholar.com/blog/get-attachment-id-from-wp-image-url/) 
+ * Thanks to Micah Wood (https://wpscholar.com/blog/get-attachment-id-from-wp-image-url/)
  * for the solution of getting an attachment_id from an image url
  *
  */
@@ -35,13 +35,24 @@
  * to fix it.
  */
 
-define( 'BIL_VERSION', '0.3.3' );
+define( 'BIL_VERSION', '0.3.4' );
 define( 'BIL_URL', plugins_url( '', __FILE__ ) );
 define( 'BIL_LANG', '__moosch__' );
 
 // Debugging
-// ini_set( 'display_errors', 'on' );
+ini_set( 'display_errors', 'on' );
 
+// Set globals
+global $bilOptions, $better_image_loading;
+
+/**
+ * Load BIL options class
+ *
+ * @since 0.3.4
+ */
+// if( file_exists( BIL_URL.'/src/options.php' ) )
+// require_once( BIL_URL.'/src/options.php' );
+// require( dirname( __FILE__.'/src/options.php' ) )
 
 /**
  * The core plugin class.
@@ -57,8 +68,9 @@ if( !class_exists('BetterImageLoading') )
 	class BetterImageLoading
 	{
 
-		private $blursize = 15;
-		
+		private $options;
+    private $blursize = 15;
+
 		/**
 		 * Class construction
 		 *
@@ -67,14 +79,15 @@ if( !class_exists('BetterImageLoading') )
 		 * @since 0.1.0
 		 * @access private
 		 */
-		function __construct()
+		function __construct($_options)
 		{
 			$this->init_plugin();
+      $this->options = $_options;
 		}
 
 		/**
 		 * Initialise plugin
-		 * 
+		 *
 		 * @since 0.1.0
 		 * @access private
 		 */
@@ -96,7 +109,7 @@ if( !class_exists('BetterImageLoading') )
 
 		/**
 		 * Set up all the required blurred image sizes we may need
-		 * 
+		 *
 		 * @since 0.3.0
 		 * @access private
 		 */
@@ -111,8 +124,8 @@ if( !class_exists('BetterImageLoading') )
 			foreach( $sizes as $size ){
 
 				// Try not to duplicate
-				if( substr($size, -4) != '_bil' 
-					&& !in_array( "{$size}_bil", $sizes ) 
+				if( substr($size, -4) != '_bil'
+					&& !in_array( "{$size}_bil", $sizes )
 					&& $size != 'blurred-thumb' ){
 
 					$w = get_option( "{$size}_size_w" );
@@ -152,7 +165,7 @@ if( !class_exists('BetterImageLoading') )
 		 * Extract an attribute from markup
 		 *
 		 * For example src from <img src="..." />
-		 * 
+		 *
 		 * @since 0.3.0
 		 * @param string $html 	- the markup used to extract attributes
 		 * @param string $att 	- the attribute we are looking to extract from $html
@@ -212,7 +225,7 @@ if( !class_exists('BetterImageLoading') )
 		 * Set new image attributes to initialise JavaScript
 		 *
 		 * Uses Wordpress wp_get_attachment_image_attributes filter
-		 * 
+		 *
 		 * @since 0.3.0
 		 * @param array $atts 			- an array of attributes set as key => value
 		 * @param object $attachment 	- the Wordpress image attachment object
@@ -282,7 +295,7 @@ if( !class_exists('BetterImageLoading') )
 				$new_srcset = array();
 				foreach( $_srcset as $src ){
 					// If is not a blurred image, add to new srcset
-					if( substr($src, -4) != '_bil' 
+					if( substr($src, -4) != '_bil'
 						&& strpos($src, $data['sizes']['blurred-thumb']['width'].'w') === false )
 						$new_srcset[] = $src;
 				}
@@ -314,7 +327,7 @@ if( !class_exists('BetterImageLoading') )
 
 		/**
 		 * Rebuild image to BIL format and attributes from html image match
-		 * 
+		 *
 		 * @since 0.3.0
 		 * @param string $html 					- the markup used to extract attributes
 		 * @param int (optional) $attachment 	- Wordpress image attachment ID
@@ -348,11 +361,11 @@ if( !class_exists('BetterImageLoading') )
 			// 	return '';
 			if( !$attachment_id )
 				$attachment_id = $this->get_attachment_id( $src );
-			
+
 			// If no attachment ID can be found, we assume there are no cropped sizes so bail
 			if( !$attachment_id )
 				return '';
-			
+
 			// If image src is not local return the markup
 			if( strpos($src, get_site_url()) === false )
 				return '';
@@ -380,7 +393,7 @@ if( !class_exists('BetterImageLoading') )
 				$new_srcset = array();
 				foreach( $srcset as $_src ){
 					// If is not a blurred image, add to new srcset
-					if( substr($_src, -4) != '_bil' 
+					if( substr($_src, -4) != '_bil'
 						&& strpos($_src, $data['sizes']['blurred-thumb']['width'].'w') === false )
 						$new_srcset[] = $_src;
 				}
@@ -435,7 +448,7 @@ if( !class_exists('BetterImageLoading') )
 
 		/**
 		 * Searched through post content for images that are local and changes the markup to load better
-		 * 
+		 *
 		 * @since 0.1.0
 		 * @param string $content 	- the markup input from the_content Wordpress filter hook
 		 * @return string 			- the mutated $html to match BIL markup if required
@@ -466,7 +479,7 @@ if( !class_exists('BetterImageLoading') )
 		 * Get an attachment ID from URL
 		 *
 		 * Credit to Micah Wood (https://wpscholar.com/blog/get-attachment-id-from-wp-image-url/) for the solution
-		 * 
+		 *
 		 * @since 0.3.2
 		 * @param string $url 	- the image url
 		 * @return int 			- Attachment ID on success, 0 on failure
@@ -508,7 +521,7 @@ if( !class_exists('BetterImageLoading') )
 
 		/**
 		 * Enqueue CSS
-		 * 
+		 *
 		 * @since 0.1.0
 		 * @access private
 		 */
@@ -519,7 +532,7 @@ if( !class_exists('BetterImageLoading') )
 
 		/**
 		 * Enqueue JavaScript
-		 * 
+		 *
 		 * @since 0.1.0
 		 * @access private
 		 */
@@ -534,7 +547,8 @@ if( !class_exists('BetterImageLoading') )
 // Start up plugin
 function BetterImageLoading()
 {
-	global $better_image_loading;
-	$better_image_loading = new BetterImageLoading();
+	global $bilOptions, $better_image_loading;
+  // $bilOptions = new BIL_Options();
+	$better_image_loading = new BetterImageLoading($bilOptions);
 }
 add_action( 'after_setup_theme', 'BetterImageLoading' );

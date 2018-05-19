@@ -14,6 +14,9 @@ It works by default on all post featured images leveraging the Wordpress post_th
 
 ### Changelog
 
+###### 0.3.4
+* Performance improvements
+
 ###### 0.3.3
 * Removed neglected code
 
