@@ -14,6 +14,15 @@ It works by default on all post featured images leveraging the Wordpress post_th
 
 ### Changelog
 
+###### 0.3.7
+* Fixed warning with newer versions of WooCommerce
+
+###### 0.3.6
+* Added CSS blur effect to loading images
+
+###### 0.3.5
+* Further performance improvements
+
 ###### 0.3.4
 * Performance improvements
 

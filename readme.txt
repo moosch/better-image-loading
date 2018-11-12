@@ -3,8 +3,8 @@ Contributors: moosch
 Tags: images, loading
 Donate link: http://wp.mooschmedia.com/donate.php
 Requires at least: 4.4.0
-Tested up to: 4.7.2
-Stable tag: 0.3.3
+Tested up to: 4.9.8
+Stable tag: 0.3.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -32,6 +32,15 @@ None yet!
 5. I recommend you regenerate all thumbnails if your media library is not empty.
 
 == Changelog ==
+
+= 0.3.7 =
+* Fixed warning with newer versions of WooCommerce
+
+= 0.3.6 =
+* Added CSS blur effect to loading images
+
+= 0.3.5 =
+* Further performance improvements
 
 = 0.3.4 =
 * Performance improvements

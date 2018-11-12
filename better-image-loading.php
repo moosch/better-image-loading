@@ -9,7 +9,7 @@
  * Plugin Name:       Better Image Loading
  * Plugin URI:        http://wp.mooschmedia.com/plugins/better-image-loading/
  * Description:       Load images better on page paint. No more jank!
- * Version:           0.3.4
+ * Version:           0.3.7
  * Author:            Moosch Media
  * Author URI:        http://wp.mooschmedia.com/
  * License:           GPL-2.0+
@@ -35,7 +35,7 @@
  * to fix it.
  */
 
-define( 'BIL_VERSION', '0.3.4' );
+define( 'BIL_VERSION', '0.3.7' );
 define( 'BIL_URL', plugins_url( '', __FILE__ ) );
 define( 'BIL_LANG', '__moosch__' );
 
@@ -150,7 +150,7 @@ if( !class_exists('BetterImageLoading') )
 				$wooSizes = array( 'shop_single', 'shop_catalog', 'shop_thumbnail' );
 				foreach( $wooSizes as $_size ){
 					$size = wc_get_image_size( $_size );
-					if( isset($size['width']) && $size['width'] != 0 ){
+					if( isset($size['height']) && isset($size['width']) && $size['width'] != 0 && $size['height'] != '' && $size['width'] != '' ){
 						$ratio = $size['height'] / $size['width'];
 						$height = $this->blursize * $ratio;
 					} else {
@@ -426,7 +426,7 @@ if( !class_exists('BetterImageLoading') )
 			$markup = $html;
 
 			// Add bil-init class
-			$classes[] = 'bil-init';
+			$classes[] = 'bil-init bil-blurred';
 			$classes = implode(' ', $classes);
 
 			// Set data-width
